@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - Smart Futuristic E-commerce</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/splitting@1.0.6/dist/splitting.css">
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'space-navy': '#0A0E1A',
+                        'electric-blue': '#00D4FF',
+                        'silver-chrome': '#C0C5CE',
+                        'purple-nebula': '#6366F1',
+                        'dark-slate': '#1E293B',
+                        'soft-gray': '#F8FAFC'
+                    },
+                    fontFamily: {
+                        'orbitron': ['Orbitron', 'monospace'],
+                        'inter': ['Inter', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #0A0E1A 0%, #1E293B 50%, #0A0E1A 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .glass-morphism {
+            background: rgba(30, 41, 59, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .product-card {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+        
+        .filter-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            border-radius: 3px;
+            background: #1E293B;
+            outline: none;
+        }
+        
+        .filter-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00D4FF;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+        
+        .filter-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #00D4FF;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+        
+        .reveal-element {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        
+        .reveal-element.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .search-wave {
+            animation: search-wave 2s ease-in-out infinite;
+        }
+        
+        @keyframes search-wave {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+        
+        .price-range-display {
+            background: linear-gradient(135deg, #00D4FF, #6366F1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        #p5-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="font-inter text-silver-chrome">
+    <!-- P5.js Background Canvas -->
+    <div id="p5-background"></div>
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-morphism">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-r from-electric-blue to-purple-nebula rounded-lg flex items-center justify-center">
+                        <span class="text-white font-orbitron font-bold text-sm">SF</span>
+                    </div>
+                    <span class="text-xl font-orbitron font-bold text-white">Smart Futuristic E-commerce</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-silver-chrome hover:text-electric-blue transition-colors">Home</a>
+                    <a href="products.html" class="text-electric-blue font-medium hover:text-white transition-colors">Products</a>
+                    <a href="cart.html" class="text-silver-chrome hover:text-electric-blue transition-colors">Cart</a>
+                    <a href="profile.html" class="text-silver-chrome hover:text-electric-blue transition-colors">Profile</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button class="relative text-silver-chrome hover:text-electric-blue transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9"></path>
+                        </svg>
+                        <span class="absolute -top-2 -right-2 bg-electric-blue text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" id="cart-count">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Header Section -->
+    <section class="pt-32 pb-12 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12 reveal-element">
+                <h1 class="text-5xl font-orbitron font-bold text-white mb-4">Smart Product Catalog</h1>
+                <p class="text-xl text-silver-chrome max-w-2xl mx-auto">
+                    Discover our complete collection of futuristic technology. Filter, search, and find the perfect devices for your smart lifestyle.
+                </p>
+            </div>
+            
+            <!-- Smart Search Interface -->
+            <div class="glass-morphism p-8 rounded-2xl mb-12 reveal-element">
+                <div class="flex flex-col lg:flex-row gap-6 items-center">
+                    <div class="flex-1 relative">
+                        <input type="text" id="smart-search" placeholder="Search products by name, category, or features..." 
+                               class="w-full bg-dark-slate text-white px-6 py-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-electric-blue text-lg">
+                        <button class="absolute right-4 top-4 text-electric-blue hover:text-white search-wave">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <button id="voice-search" class="w-12 h-12 bg-electric-blue rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                            </svg>
+                        </button>
+                        
+                        <select id="sort-select" class="bg-dark-slate text-white px-4 py-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-electric-blue">
+                            <option value="featured">Featured</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="newest">Newest First</option>
+                            <option value="rating">Highest Rated</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Search Suggestions -->
+                <div id="search-suggestions" class="mt-4 hidden">
+                    <div class="flex flex-wrap gap-2">
+                        <span class="text-sm text-silver-chrome">Popular searches:</span>
+                        <button class="text-sm text-electric-blue hover:text-white transition-colors">Smart Ring</button>
+                        <button class="text-sm text-electric-blue hover:text-white transition-colors">AR Glasses</button>
+                        <button class="text-sm text-electric-blue hover:text-white transition-colors">Health Monitor</button>
+                        <button class="text-sm text-electric-blue hover:text-white transition-colors">Smart Home</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Main Content -->
+    <section class="pb-20">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid lg:grid-cols-4 gap-8">
+                <!-- Smart Filter Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="glass-morphism p-6 rounded-2xl sticky top-32 reveal-element">
+                        <h3 class="text-xl font-orbitron font-bold text-white mb-6">Smart Filters</h3>
+                        
+                        <!-- Price Range -->
+                        <div class="mb-8">
+                            <h4 class="text-lg font-semibold text-white mb-4">Price Range</h4>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-silver-chrome">$0</span>
+                                    <span class="text-sm price-range-display font-bold" id="price-display">$0 - $1000</span>
+                                    <span class="text-sm text-silver-chrome">$1000+</span>
+                                </div>
+                                <input type="range" id="price-range" class="filter-slider w-full" min="0" max="1000" value="1000">
+                            </div>
+                        </div>
+                        
+                        <!-- Categories -->
+                        <div class="mb-8">
+                            <h4 class="text-lg font-semibold text-white mb-4">Categories</h4>
+                            <div class="space-y-3">
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" class="category-filter" value="wearables" checked>
+                                    <span class="text-silver-chrome">Wearables</span>
+                                    <span class="ml-auto text-xs bg-dark-slate px-2 py-1 rounded-full">8</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" class="category-filter" value="smart-home" checked>
+                                    <span class="text-silver-chrome">Smart Home</span>
+                                    <span class="ml-auto text-xs bg-dark-slate px-2 py-1 rounded-full">12</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" class="category-filter" value="health" checked>
+                                    <span class="text-silver-chrome">Health Tech</span>
+                                    <span class="ml-auto text-xs bg-dark-slate px-2 py-1 rounded-full">6</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" class="category-filter" value="entertainment" checked>
+                                    <span class="text-silver-chrome">Entertainment</span>
+                                    <span class="ml-auto text-xs bg-dark-slate px-2 py-1 rounded-full">10</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Features -->
+                        <div class="mb-8">
+                            <h4 class="text-lg font-semibold text-white mb-4">Features</h4>
+                            <div class="space-y-3">
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" class="feature-filter" value="ai-powered">
+                                    <span class="text-silver-chrome">AI Powered</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" class="feature-filter" value="wireless">
+                                    <span class="text-silver-chrome">Wireless</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" class="feature-filter" value="health-tracking">
+                                    <span class="text-silver-chrome">Health Tracking</span>
+                                </label>
+                                <label class="flex items-center space-x-3 cursor-pointer">
+                                    <input type="checkbox" class="feature-filter" value="voice-control">
+                                    <span class="text-silver-chrome">Voice Control</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- AI Suggestions -->
+                        <div class="mb-8">
+                            <h4 class="text-lg font-semibold text-white mb-4">AI Suggestions</h4>
+                            <div class="space-y-2">
+                                <button class="w-full text-left p-3 glass-morphism rounded-lg hover:bg-electric-blue hover:bg-opacity-20 transition-colors">
+                                    <div class="text-sm text-white font-medium">Budget Friendly</div>
+                                    <div class="text-xs text-silver-chrome">Products under $200</div>
+                                </button>
+                                <button class="w-full text-left p-3 glass-morphism rounded-lg hover:bg-electric-blue hover:bg-opacity-20 transition-colors">
+                                    <div class="text-sm text-white font-medium">Premium Collection</div>
+                                    <div class="text-xs text-silver-chrome">High-end devices</div>
+                                </button>
+                                <button class="w-full text-left p-3 glass-morphism rounded-lg hover:bg-electric-blue hover:bg-opacity-20 transition-colors">
+                                    <div class="text-sm text-white font-medium">New Arrivals</div>
+                                    <div class="text-xs text-silver-chrome">Latest technology</div>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <button id="clear-filters" class="w-full bg-dark-slate text-silver-chrome py-3 rounded-lg hover:bg-electric-blue hover:text-white transition-colors">
+                            Clear All Filters
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Product Grid -->
+                <div class="lg:col-span-3">
+                    <!-- Results Header -->
+                    <div class="flex items-center justify-between mb-8 reveal-element">
+                        <div>
+                            <h2 class="text-2xl font-orbitron font-bold text-white">All Products</h2>
+                            <p class="text-silver-chrome" id="results-count">Showing 36 products</p>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4">
+                            <button id="grid-view" class="p-2 text-electric-blue bg-dark-slate rounded-lg">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M3 3h7v7H3V3zm0 11h7v7H3v-7zm11-11h7v7h-7V3zm0 11h7v7h-7v-7z"/>
+                                </svg>
+                            </button>
+                            <button id="list-view" class="p-2 text-silver-chrome hover:text-electric-blue rounded-lg">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Product Grid Container -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8" id="products-container">
+                        <!-- Products will be dynamically loaded here -->
+                    </div>
+                    
+                    <!-- Load More Button -->
+                    <div class="text-center mt-12 reveal-element">
+                        <button id="load-more" class="bg-electric-blue text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-600 transition-all duration-300">
+                            Load More Products
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Quick View Modal -->
+    <div id="quick-view-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-morphism max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-2xl">
+            <div class="p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-2xl font-orbitron font-bold text-white">Product Details</h3>
+                    <button id="close-modal" class="text-silver-chrome hover:text-white">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <img id="modal-image" src="" alt="" class="w-full h-64 object-cover rounded-xl mb-4">
+                        <div class="grid grid-cols-4 gap-2">
+                            <img src="" alt="" class="w-full h-16 object-cover rounded-lg cursor-pointer opacity-60 hover:opacity-100">
+                            <img src="" alt="" class="w-full h-16 object-cover rounded-lg cursor-pointer opacity-60 hover:opacity-100">
+                            <img src="" alt="" class="w-full h-16 object-cover rounded-lg cursor-pointer opacity-60 hover:opacity-100">
+                            <img src="" alt="" class="w-full h-16 object-cover rounded-lg cursor-pointer opacity-60 hover:opacity-100">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h4 id="modal-title" class="text-xl font-semibold text-white mb-2"></h4>
+                        <p id="modal-price" class="text-3xl font-bold text-electric-blue mb-4"></p>
+                        <p id="modal-description" class="text-silver-chrome mb-6"></p>
+                        
+                        <div class="space-y-4 mb-6">
+                            <div>
+                                <h5 class="text-white font-medium mb-2">Key Features</h5>
+                                <ul id="modal-features" class="text-sm text-silver-chrome space-y-1">
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-center space-x-4">
+                            <button id="modal-add-to-cart" class="flex-1 bg-electric-blue text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors">
+                                Add to Cart
+                            </button>
+                            <button class="p-3 border border-electric-blue text-electric-blue rounded-lg hover:bg-electric-blue hover:text-white transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center">
+                <div class="flex items-center justify-center space-x-2 mb-4">
+                    <div class="w-8 h-8 bg-gradient-to-r from-electric-blue to-purple-nebula rounded-lg flex items-center justify-center">
+                        <span class="text-white font-orbitron font-bold text-sm">SF</span>
+                    </div>
+                    <span class="text-xl font-orbitron font-bold text-white">Smart Futuristic E-commerce</span>
+                </div>
+                <p class="text-silver-chrome mb-4">The Future of Smart Living</p>
+                <p class="text-sm text-soft-gray">© 2025 Smart Futuristic E-commerce. All rights reserved. Pioneering the future of technology.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="main.js"></script>
+    <script>
+        // Products page specific functionality
+        class ProductsPage {
+            constructor() {
+                this.products = [
+                    {
+                        id: 'aura-ring',
+                        name: 'Aura Smart Ring',
+                        price: 299,
+                        category: 'wearables',
+                        features: ['health-tracking', 'wireless'],
+                        image: 'https://kimi-web-img.moonshot.cn/img/upload.wikimedia.org/cd6ff13e74fe7253f7114b137acf95f3449e28f6.jpg',
+                        description: 'Advanced health monitoring in a sleek design. Track sleep, activity, and wellness metrics with precision.',
+                        rating: 4.8,
+                        isNew: true
+                    },
+                    {
+                        id: 'ar-glasses',
+                        name: 'Vision AR Glasses',
+                        price: 899,
+                        category: 'entertainment',
+                        features: ['ai-powered', 'wireless'],
+                        image: 'https://kimi-web-img.moonshot.cn/img/www.pqdesign.com/5cfa113eef2c5b3894feeee7fb45242b52e65662.jpg',
+                        description: 'Immersive augmented reality experience with AI-powered features and voice control.',
+                        rating: 4.9,
+                        isPremium: true
+                    },
+                    {
+                        id: 'thermostat',
+                        name: 'EcoSmart Thermostat',
+                        price: 249,
+                        category: 'smart-home',
+                        features: ['ai-powered', 'wireless'],
+                        image: 'https://kimi-web-img.moonshot.cn/img/images.ctfassets.net/2818622e2e4042c0868d26aac755ec3bd7bbdcef7.jpg',
+                        description: 'AI-powered climate control that learns your preferences and saves energy.',
+                        rating: 4.7,
+                        isEco: true
+                    },
+                    {
+                        id: 'health-monitor',
+                        name: 'VitalTrack Pro',
+                        price: 399,
+                        category: 'health',
+                        features: ['health-tracking', 'ai-powered', 'wireless'],
+                        image: 'https://kimi-web-img.moonshot.cn/img/www.microcontrollertips.com/2c3f5b5f7f0b4cf8fa9b889ed4394e3ea90dfaa7.jpg',
+                        description: 'Advanced health monitoring with ECG, blood oxygen, and continuous tracking.',
+                        rating: 4.6,
+                        isMedical: true
+                    },
+                    {
+                        id: 'smart-mirror',
+                        name: 'Infinity Smart Mirror',
+                        price: 599,
+                        category: 'smart-home',
+                        features: ['ai-powered', 'voice-control'],
+                        image: 'https://kimi-web-img.moonshot.cn/img/www.twowaymirrors.com/6744c773027ce6b884ccd8b48d428751bcc4c9f5.jpg',
+                        description: 'Interactive mirror with AI assistant, weather, news, and smart home control.',
+                        rating: 4.5
+                    },
+                    {
+                        id: 'earbuds',
+                        name: 'SoundWave Pro',
+                        price: 199,
+                        category: 'entertainment',
+                        features: ['ai-powered', 'wireless'],
+                        image: 'https://kimi-web-img.moonshot.cn/img/cdnp2.stackassets.com/227cfba9e3752e21b2b7735e2edf26fec96e599f.jpg',
+                        description: 'Premium wireless earbuds with AI noise cancellation and spatial audio.',
+                        rating: 4.4
+                    },
+                    {
+                        id: 'security-camera',
+                        name: 'SecureCam 360',
+                        price: 149,
+                        category: 'smart-home',
+                        features: ['ai-powered', 'wireless'],
+                        image: 'https://kimi-web-img.moonshot.cn/img/images.ctfassets.net/41f8cee8f03e8a4fe422db47bec087461ca5af84.png',
+                        description: 'AI-powered security camera with facial recognition and smart alerts.',
+                        rating: 4.3
+                    },
+                    {
+                        id: 'robot-vacuum',
+                        name: 'CleanBot AI',
+                        price: 349,
+                        category: 'smart-home',
+                        features: ['ai-powered', 'wireless'],
+                        image: 'https://kimi-web-img.moonshot.cn/img/i5.walmartimages.com/207ffc74aa66b550893d3e265db70bb5a4305c6c.jpeg',
+                        description: 'Smart robot vacuum with AI navigation and automatic dirt disposal.',
+                        rating: 4.2
+                    }
+                ];
+                
+                this.filteredProducts = [...this.products];
+                this.currentView = 'grid';
+                this.init();
+            }
+            
+            init() {
+                this.renderProducts();
+                this.initFilters();
+                this.initSearch();
+                this.initModal();
+                this.initViewToggle();
+                this.updateResultsCount();
+            }
+            
+            renderProducts() {
+                const container = document.getElementById('products-container');
+                container.innerHTML = '';
+                
+                this.filteredProducts.forEach((product, index) => {
+                    const productCard = this.createProductCard(product);
+                    container.appendChild(productCard);
+                    
+                    // Animate in
+                    setTimeout(() => {
+                        anime({
+                            targets: productCard,
+                            opacity: [0, 1],
+                            translateY: [30, 0],
+                            duration: 600,
+                            easing: 'easeOutQuart'
+                        });
+                    }, index * 100);
+                });
+            }
+            
+            createProductCard(product) {
+                const card = document.createElement('div');
+                card.className = 'product-card p-6 rounded-xl reveal-element cursor-pointer';
+                card.dataset.productId = product.id;
+                
+                const badges = [];
+                if (product.isNew) badges.push('<div class="absolute top-2 right-2 bg-electric-blue text-white text-xs px-2 py-1 rounded-full">New</div>');
+                if (product.isPremium) badges.push('<div class="absolute top-2 right-2 bg-purple-nebula text-white text-xs px-2 py-1 rounded-full">Premium</div>');
+                if (product.isEco) badges.push('<div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">Eco</div>');
+                if (product.isMedical) badges.push('<div class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">Medical</div>');
+                
+                card.innerHTML = `
+                    <div class="relative mb-4">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover rounded-lg">
+                        ${badges.join('')}
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">${product.name}</h3>
+                    <p class="text-sm text-silver-chrome mb-4">${product.description}</p>
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-2xl font-bold text-electric-blue">$${product.price}</span>
+                        <div class="flex items-center space-x-1">
+                            ${Array(5).fill(0).map((_, i) => `
+                                <svg class="w-4 h-4 ${i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-600'}" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                            `).join('')}
+                            <span class="text-xs text-silver-chrome ml-1">${product.rating}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="add-to-cart flex-1 bg-electric-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors" 
+                                data-product="${product.id}" data-price="${product.price}">
+                            Add to Cart
+                        </button>
+                        <button class="quick-view p-2 border border-electric-blue text-electric-blue rounded-lg hover:bg-electric-blue hover:text-white transition-colors"
+                                data-product-id="${product.id}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                
+                return card;
+            }
+            
+            initFilters() {
+                // Price range filter
+                const priceRange = document.getElementById('price-range');
+                const priceDisplay = document.getElementById('price-display');
+                
+                priceRange.addEventListener('input', () => {
+                    const maxPrice = priceRange.value;
+                    priceDisplay.textContent = `$0 - $${maxPrice}`;
+                    this.applyFilters();
+                });
+                
+                // Category filters
+                document.querySelectorAll('.category-filter').forEach(filter => {
+                    filter.addEventListener('change', () => {
+                        this.applyFilters();
+                    });
+                });
+                
+                // Feature filters
+                document.querySelectorAll('.feature-filter').forEach(filter => {
+                    filter.addEventListener('change', () => {
+                        this.applyFilters();
+                    });
+                });
+                
+                // Clear filters
+                document.getElementById('clear-filters').addEventListener('click', () => {
+                    priceRange.value = 1000;
+                    priceDisplay.textContent = '$0 - $1000';
+                    document.querySelectorAll('.category-filter, .feature-filter').forEach(filter => {
+                        filter.checked = true;
+                    });
+                    this.applyFilters();
+                });
+                
+                // Sort functionality
+                document.getElementById('sort-select').addEventListener('change', (e) => {
+                    this.sortProducts(e.target.value);
+                });
+            }
+            
+            applyFilters() {
+                const maxPrice = parseInt(document.getElementById('price-range').value);
+                const selectedCategories = Array.from(document.querySelectorAll('.category-filter:checked')).map(f => f.value);
+                const selectedFeatures = Array.from(document.querySelectorAll('.feature-filter:checked')).map(f => f.value);
+                
+                this.filteredProducts = this.products.filter(product => {
+                    const priceMatch = product.price <= maxPrice;
+                    const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(product.category);
+                    const featureMatch = selectedFeatures.length === 0 || selectedFeatures.some(feature => product.features.includes(feature));
+                    
+                    return priceMatch && categoryMatch && featureMatch;
+                });
+                
+                this.renderProducts();
+                this.updateResultsCount();
+            }
+            
+            sortProducts(sortBy) {
+                switch (sortBy) {
+                    case 'price-low':
+                        this.filteredProducts.sort((a, b) => a.price - b.price);
+                        break;
+                    case 'price-high':
+                        this.filteredProducts.sort((a, b) => b.price - a.price);
+                        break;
+                    case 'rating':
+                        this.filteredProducts.sort((a, b) => b.rating - a.rating);
+                        break;
+                    case 'newest':
+                        this.filteredProducts.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+                        break;
+                    default:
+                        // Featured - keep original order
+                        break;
+                }
+                
+                this.renderProducts();
+            }
+            
+            initSearch() {
+                const searchInput = document.getElementById('smart-search');
+                const voiceBtn = document.getElementById('voice-search');
+                
+                searchInput.addEventListener('input', (e) => {
+                    this.searchProducts(e.target.value);
+                });
+                
+                voiceBtn.addEventListener('click', () => {
+                    this.simulateVoiceSearch();
+                });
+            }
+            
+            searchProducts(query) {
+                if (!query.trim()) {
+                    this.filteredProducts = [...this.products];
+                } else {
+                    const searchTerm = query.toLowerCase();
+                    this.filteredProducts = this.products.filter(product => 
+                        product.name.toLowerCase().includes(searchTerm) ||
+                        product.description.toLowerCase().includes(searchTerm) ||
+                        product.category.toLowerCase().includes(searchTerm)
+                    );
+                }
+                
+                this.renderProducts();
+                this.updateResultsCount();
+            }
+            
+            simulateVoiceSearch() {
+                const searchInput = document.getElementById('smart-search');
+                const queries = ['smart ring', 'AR glasses', 'health monitor', 'wireless earbuds'];
+                const randomQuery = queries[Math.floor(Math.random() * queries.length)];
+                
+                searchInput.value = randomQuery;
+                this.searchProducts(randomQuery);
+                
+                // Visual feedback
+                anime({
+                    targets: searchInput,
+                    scale: [1, 1.02, 1],
+                    duration: 400
+                });
+            }
+            
+            initModal() {
+                const modal = document.getElementById('quick-view-modal');
+                const closeBtn = document.getElementById('close-modal');
+                
+                // Close modal
+                closeBtn.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                });
+                
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.add('hidden');
+                    }
+                });
+                
+                // Quick view buttons
+                document.addEventListener('click', (e) => {
+                    if (e.target.closest('.quick-view')) {
+                        const productId = e.target.closest('.quick-view').dataset.productId;
+                        this.showProductModal(productId);
+                    }
+                });
+            }
+            
+            showProductModal(productId) {
+                const product = this.products.find(p => p.id === productId);
+                if (!product) return;
+                
+                const modal = document.getElementById('quick-view-modal');
+                
+                // Populate modal content
+                document.getElementById('modal-image').src = product.image;
+                document.getElementById('modal-image').alt = product.name;
+                document.getElementById('modal-title').textContent = product.name;
+                document.getElementById('modal-price').textContent = `$${product.price}`;
+                document.getElementById('modal-description').textContent = product.description;
+                
+                // Set up add to cart button
+                const addToCartBtn = document.getElementById('modal-add-to-cart');
+                addToCartBtn.dataset.product = product.id;
+                addToCartBtn.dataset.price = product.price;
+                
+                // Show modal
+                modal.classList.remove('hidden');
+                
+                // Animate in
+                anime({
+                    targets: modal.querySelector('.glass-morphism'),
+                    scale: [0.8, 1],
+                    opacity: [0, 1],
+                    duration: 400,
+                    easing: 'easeOutQuart'
+                });
+            }
+            
+            initViewToggle() {
+                const gridBtn = document.getElementById('grid-view');
+                const listBtn = document.getElementById('list-view');
+                
+                gridBtn.addEventListener('click', () => {
+                    this.setView('grid');
+                    gridBtn.classList.add('text-electric-blue', 'bg-dark-slate');
+                    listBtn.classList.remove('text-electric-blue', 'bg-dark-slate');
+                    listBtn.classList.add('text-silver-chrome');
+                });
+                
+                listBtn.addEventListener('click', () => {
+                    this.setView('list');
+                    listBtn.classList.add('text-electric-blue', 'bg-dark-slate');
+                    gridBtn.classList.remove('text-electric-blue', 'bg-dark-slate');
+                    gridBtn.classList.add('text-silver-chrome');
+                });
+            }
+            
+            setView(view) {
+                this.currentView = view;
+                const container = document.getElementById('products-container');
+                
+                if (view === 'list') {
+                    container.className = 'space-y-4';
+                } else {
+                    container.className = 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8';
+                }
+                
+                this.renderProducts();
+            }
+            
+            updateResultsCount() {
+                const count = this.filteredProducts.length;
+                document.getElementById('results-count').textContent = `Showing ${count} product${count !== 1 ? 's' : ''}`;
+            }
+        }
+        
+        // Initialize products page
+        document.addEventListener('DOMContentLoaded', () => {
+            new ProductsPage();
+        });
+    </script>
+</body>
+</html>

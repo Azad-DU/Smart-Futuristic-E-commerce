@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Futuristic E-commerce - The Future of Smart Living</title>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
+    <script src="https://unpkg.com/splitting@1.0.6/dist/splitting.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/splitting@1.0.6/dist/splitting.css">
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'space-navy': '#0A0E1A',
+                        'electric-blue': '#00D4FF',
+                        'silver-chrome': '#C0C5CE',
+                        'purple-nebula': '#6366F1',
+                        'dark-slate': '#1E293B',
+                        'soft-gray': '#F8FAFC'
+                    },
+                    fontFamily: {
+                        'orbitron': ['Orbitron', 'monospace'],
+                        'inter': ['Inter', 'sans-serif'],
+                        'mono': ['JetBrains Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #0A0E1A 0%, #1E293B 50%, #0A0E1A 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .hero-bg {
+            background: url('resources/hero-main.png') center/cover no-repeat;
+            position: relative;
+        }
+        
+        .hero-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(10, 14, 26, 0.8) 0%, rgba(30, 41, 59, 0.6) 50%, rgba(10, 14, 26, 0.8) 100%);
+        }
+        
+        .glass-morphism {
+            background: rgba(30, 41, 59, 0.3);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .product-card {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.2);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+        
+        .electric-glow {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, #00D4FF 0%, #6366F1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulse-glow {
+            from { box-shadow: 0 0 20px rgba(0, 212, 255, 0.3); }
+            to { box-shadow: 0 0 30px rgba(0, 212, 255, 0.6); }
+        }
+        
+        .reveal-element {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease;
+        }
+        
+        .reveal-element.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        #p5-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body class="font-inter text-silver-chrome">
+    <!-- P5.js Background Canvas -->
+    <div id="p5-background"></div>
+    
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 glass-morphism">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-gradient-to-r from-electric-blue to-purple-nebula rounded-lg flex items-center justify-center">
+                        <span class="text-white font-orbitron font-bold text-sm">SF</span>
+                    </div>
+                    <span class="text-xl font-orbitron font-bold text-white">Smart Futuristic E-commerce</span>
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="text-electric-blue font-medium hover:text-white transition-colors">Home</a>
+                    <a href="products.html" class="text-silver-chrome hover:text-electric-blue transition-colors">Products</a>
+                    <a href="cart.html" class="text-silver-chrome hover:text-electric-blue transition-colors">Cart</a>
+                    <a href="profile.html" class="text-silver-chrome hover:text-electric-blue transition-colors">Profile</a>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <input type="text" placeholder="Search products..." 
+                               class="bg-dark-slate text-white px-4 py-2 rounded-lg w-64 focus:outline-none focus:ring-2 focus:ring-electric-blue">
+                        <button class="absolute right-2 top-2 text-electric-blue hover:text-white">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <button class="relative text-silver-chrome hover:text-electric-blue transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 6M7 13l-1.5 6m0 0h9"></path>
+                        </svg>
+                        <span class="absolute -top-2 -right-2 bg-electric-blue text-white text-xs rounded-full w-5 h-5 flex items-center justify-center" id="cart-count">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero-bg min-h-screen flex items-center relative pt-20">
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-8">
+                    <h1 class="text-6xl lg:text-7xl font-orbitron font-bold leading-tight">
+                        <span class="text-white">The Future of</span>
+                        <span class="text-gradient block" id="typed-text"></span>
+                    </h1>
+                    
+                    <p class="text-xl text-silver-chrome leading-relaxed max-w-lg">
+                        Discover cutting-edge technology that transforms your daily life. From AI-powered assistants to wearable innovations, experience the next generation of smart living.
+                    </p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button class="bg-electric-blue text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-600 transition-all duration-300 electric-glow pulse-glow">
+                            Explore Products
+                        </button>
+                        <button class="border border-electric-blue text-electric-blue px-8 py-4 rounded-lg font-semibold hover:bg-electric-blue hover:text-white transition-all duration-300">
+                            Watch Demo
+                        </button>
+                    </div>
+                    
+                    <!-- AI Search Interface -->
+                    <div class="glass-morphism p-6 rounded-xl">
+                        <div class="flex items-center space-x-4 mb-4">
+                            <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                            <span class="text-sm font-mono">AI Assistant Active</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button class="w-12 h-12 bg-electric-blue rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                                </svg>
+                            </button>
+                            <input type="text" placeholder="Ask me anything about our products..." 
+                                   class="flex-1 bg-transparent text-white placeholder-silver-chrome focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="relative">
+                    <div class="floating-animation">
+                        <img src="resources/products-hero.png" alt="Futuristic Products" class="w-full h-auto">
+                    </div>
+                    
+                    <!-- Floating Product Previews -->
+                    <div class="absolute -top-4 -right-4 glass-morphism p-4 rounded-xl">
+                        <img src="https://kimi-web-img.moonshot.cn/img/upload.wikimedia.org/cd6ff13e74fe7253f7114b137acf95f3449e28f6.jpg" alt="Smart Ring" class="w-16 h-16 object-cover rounded-lg">
+                        <p class="text-xs mt-2 text-center">Smart Ring</p>
+                        <p class="text-xs text-electric-blue text-center">$299</p>
+                    </div>
+                    
+                    <div class="absolute -bottom-4 -left-4 glass-morphism p-4 rounded-xl">
+                        <img src="https://kimi-web-img.moonshot.cn/img/www.pqdesign.com/5cfa113eef2c5b3894feeee7fb45242b52e65662.jpg" alt="AR Glasses" class="w-16 h-16 object-cover rounded-lg">
+                        <p class="text-xs mt-2 text-center">AR Glasses</p>
+                        <p class="text-xs text-electric-blue text-center">$899</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Featured Products Section -->
+    <section class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal-element">
+                <h2 class="text-4xl font-orbitron font-bold text-white mb-4">Featured Products</h2>
+                <p class="text-xl text-silver-chrome max-w-2xl mx-auto">
+                    Discover our curated selection of cutting-edge technology designed to enhance your digital lifestyle.
+                </p>
+            </div>
+            
+            <!-- Product Categories -->
+            <div class="flex flex-wrap justify-center gap-4 mb-12 reveal-element">
+                <button class="category-btn active bg-electric-blue text-white px-6 py-3 rounded-lg font-medium transition-all duration-300" data-category="all">
+                    All Products
+                </button>
+                <button class="category-btn bg-dark-slate text-silver-chrome hover:bg-electric-blue hover:text-white px-6 py-3 rounded-lg font-medium transition-all duration-300" data-category="wearables">
+                    Wearables
+                </button>
+                <button class="category-btn bg-dark-slate text-silver-chrome hover:bg-electric-blue hover:text-white px-6 py-3 rounded-lg font-medium transition-all duration-300" data-category="smart-home">
+                    Smart Home
+                </button>
+                <button class="category-btn bg-dark-slate text-silver-chrome hover:bg-electric-blue hover:text-white px-6 py-3 rounded-lg font-medium transition-all duration-300" data-category="health">
+                    Health Tech
+                </button>
+                <button class="category-btn bg-dark-slate text-silver-chrome hover:bg-electric-blue hover:text-white px-6 py-3 rounded-lg font-medium transition-all duration-300" data-category="entertainment">
+                    Entertainment
+                </button>
+            </div>
+            
+            <!-- Product Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" id="product-grid">
+                <!-- Smart Ring -->
+                <div class="product-card p-6 rounded-xl reveal-element" data-category="wearables">
+                    <div class="relative mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/upload.wikimedia.org/cd6ff13e74fe7253f7114b137acf95f3449e28f6.jpg" alt="Smart Ring" class="w-full h-48 object-cover rounded-lg">
+                        <div class="absolute top-2 right-2 bg-electric-blue text-white text-xs px-2 py-1 rounded-full">New</div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Aura Smart Ring</h3>
+                    <p class="text-sm text-silver-chrome mb-4">Advanced health monitoring in a sleek design. Track sleep, activity, and wellness metrics.</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-2xl font-bold text-electric-blue">$299</span>
+                        <button class="add-to-cart bg-electric-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors" data-product="aura-ring" data-price="299">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- AR Glasses -->
+                <div class="product-card p-6 rounded-xl reveal-element" data-category="entertainment">
+                    <div class="relative mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/www.pqdesign.com/5cfa113eef2c5b3894feeee7fb45242b52e65662.jpg" alt="AR Glasses" class="w-full h-48 object-cover rounded-lg">
+                        <div class="absolute top-2 right-2 bg-purple-nebula text-white text-xs px-2 py-1 rounded-full">Premium</div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Vision AR Glasses</h3>
+                    <p class="text-sm text-silver-chrome mb-4">Immersive augmented reality experience with AI-powered features and voice control.</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-2xl font-bold text-electric-blue">$899</span>
+                        <button class="add-to-cart bg-electric-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors" data-product="ar-glasses" data-price="899">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Smart Thermostat -->
+                <div class="product-card p-6 rounded-xl reveal-element" data-category="smart-home">
+                    <div class="relative mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/images.ctfassets.net/2818622e2e4042c0868d26aac755ec3bd7bbdcef7.jpg" alt="Smart Thermostat" class="w-full h-48 object-cover rounded-lg">
+                        <div class="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded-full">Eco</div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">EcoSmart Thermostat</h3>
+                    <p class="text-sm text-silver-chrome mb-4">AI-powered climate control that learns your preferences and saves energy.</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-2xl font-bold text-electric-blue">$249</span>
+                        <button class="add-to-cart bg-electric-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors" data-product="thermostat" data-price="249">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Health Monitor -->
+                <div class="product-card p-6 rounded-xl reveal-element" data-category="health">
+                    <div class="relative mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/www.microcontrollertips.com/2c3f5b5f7f0b4cf8fa9b889ed4394e3ea90dfaa7.jpg" alt="Health Monitor" class="w-full h-48 object-cover rounded-lg">
+                        <div class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">Medical</div>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">VitalTrack Pro</h3>
+                    <p class="text-sm text-silver-chrome mb-4">Advanced health monitoring with ECG, blood oxygen, and continuous tracking.</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-2xl font-bold text-electric-blue">$399</span>
+                        <button class="add-to-cart bg-electric-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors" data-product="health-monitor" data-price="399">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Smart Mirror -->
+                <div class="product-card p-6 rounded-xl reveal-element" data-category="smart-home">
+                    <div class="relative mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/www.twowaymirrors.com/6744c773027ce6b884ccd8b48d428751bcc4c9f5.jpg" alt="Smart Mirror" class="w-full h-48 object-cover rounded-lg">
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Infinity Smart Mirror</h3>
+                    <p class="text-sm text-silver-chrome mb-4">Interactive mirror with AI assistant, weather, news, and smart home control.</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-2xl font-bold text-electric-blue">$599</span>
+                        <button class="add-to-cart bg-electric-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors" data-product="smart-mirror" data-price="599">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Wireless Earbuds -->
+                <div class="product-card p-6 rounded-xl reveal-element" data-category="entertainment">
+                    <div class="relative mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/cdnp2.stackassets.com/227cfba9e3752e21b2b7735e2edf26fec96e599f.jpg" alt="Wireless Earbuds" class="w-full h-48 object-cover rounded-lg">
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">SoundWave Pro</h3>
+                    <p class="text-sm text-silver-chrome mb-4">Premium wireless earbuds with AI noise cancellation and spatial audio.</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-2xl font-bold text-electric-blue">$199</span>
+                        <button class="add-to-cart bg-electric-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors" data-product="earbuds" data-price="199">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Home Security Camera -->
+                <div class="product-card p-6 rounded-xl reveal-element" data-category="smart-home">
+                    <div class="relative mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/images.ctfassets.net/41f8cee8f03e8a4fe422db47bec087461ca5af84.png" alt="Security Camera" class="w-full h-48 object-cover rounded-lg">
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">SecureCam 360</h3>
+                    <p class="text-sm text-silver-chrome mb-4">AI-powered security camera with facial recognition and smart alerts.</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-2xl font-bold text-electric-blue">$149</span>
+                        <button class="add-to-cart bg-electric-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors" data-product="security-camera" data-price="149">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Robot Vacuum -->
+                <div class="product-card p-6 rounded-xl reveal-element" data-category="smart-home">
+                    <div class="relative mb-4">
+                        <img src="https://kimi-web-img.moonshot.cn/img/i5.walmartimages.com/207ffc74aa66b550893d3e265db70bb5a4305c6c.jpeg" alt="Robot Vacuum" class="w-full h-48 object-cover rounded-lg">
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">CleanBot AI</h3>
+                    <p class="text-sm text-silver-chrome mb-4">Smart robot vacuum with AI navigation and automatic dirt disposal.</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-2xl font-bold text-electric-blue">$349</span>
+                        <button class="add-to-cart bg-electric-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors" data-product="robot-vacuum" data-price="349">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- AI Recommendations Section -->
+    <section class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16 reveal-element">
+                <h2 class="text-4xl font-orbitron font-bold text-white mb-4">AI-Powered Recommendations</h2>
+                <p class="text-xl text-silver-chrome max-w-2xl mx-auto">
+                    Our intelligent system analyzes your preferences to suggest the perfect products for your lifestyle.
+                </p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="reveal-element">
+                    <img src="resources/ai-shopping.png" alt="AI Shopping Interface" class="w-full h-auto rounded-xl">
+                </div>
+                
+                <div class="space-y-8 reveal-element">
+                    <div class="glass-morphism p-6 rounded-xl">
+                        <h3 class="text-xl font-semibold text-white mb-4">Smart Analysis</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-silver-chrome">Health Focus</span>
+                                <div class="w-32 bg-dark-slate rounded-full h-2">
+                                    <div class="bg-electric-blue h-2 rounded-full" style="width: 85%"></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-silver-chrome">Tech Enthusiasm</span>
+                                <div class="w-32 bg-dark-slate rounded-full h-2">
+                                    <div class="bg-purple-nebula h-2 rounded-full" style="width: 92%"></div>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-silver-chrome">Smart Home</span>
+                                <div class="w-32 bg-dark-slate rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: 78%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-semibold text-white">Recommended for You</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center space-x-4 p-4 glass-morphism rounded-lg">
+                                <img src="https://kimi-web-img.moonshot.cn/img/upload.wikimedia.org/cd6ff13e74fe7253f7114b137acf95f3449e28f6.jpg" alt="Smart Ring" class="w-12 h-12 object-cover rounded-lg">
+                                <div class="flex-1">
+                                    <h4 class="text-white font-medium">Aura Smart Ring</h4>
+                                    <p class="text-sm text-silver-chrome">Perfect for health tracking</p>
+                                </div>
+                                <span class="text-electric-blue font-bold">$299</span>
+                            </div>
+                            
+                            <div class="flex items-center space-x-4 p-4 glass-morphism rounded-lg">
+                                <img src="https://kimi-web-img.moonshot.cn/img/www.microcontrollertips.com/2c3f5b5f7f0b4cf8fa9b889ed4394e3ea90dfaa7.jpg" alt="Health Monitor" class="w-12 h-12 object-cover rounded-lg">
+                                <div class="flex-1">
+                                    <h4 class="text-white font-medium">VitalTrack Pro</h4>
+                                    <p class="text-sm text-silver-chrome">Advanced health monitoring</p>
+                                </div>
+                                <span class="text-electric-blue font-bold">$399</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center">
+                <div class="flex items-center justify-center space-x-2 mb-4">
+                    <div class="w-8 h-8 bg-gradient-to-r from-electric-blue to-purple-nebula rounded-lg flex items-center justify-center">
+                        <span class="text-white font-orbitron font-bold text-sm">SF</span>
+                    </div>
+                    <span class="text-xl font-orbitron font-bold text-white">Smart Futuristic E-commerce</span>
+                </div>
+                <p class="text-silver-chrome mb-4">The Future of Smart Living</p>
+                <p class="text-sm text-soft-gray">© 2025 Smart Futuristic E-commerce. All rights reserved. Pioneering the future of technology.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="main.js"></script>
+</body>
+</html>
